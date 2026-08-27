@@ -1,10 +1,12 @@
 import { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://chargebox.fr";
+export const dynamic = "force-dynamic";
 
-  // Static pages
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://chargebox.fr";
+
+  // 1. Pages Statiques Principales & Légales
   const staticPages = [
     "",
     "/produits",
@@ -16,6 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/mentions-legales",
     "/cgv",
     "/politique-de-confidentialite",
+    "/politique-cookies",
     "/livraison",
     "/retours",
   ].map((route) => ({
@@ -26,6 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   try {
+    // 2. Pages Produits Dynamiques (générées en direct depuis la base de données)
     const products = await prisma.product.findMany({
       where: { isActive: true },
       select: { slug: true, updatedAt: true },
@@ -38,7 +42,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     }));
 
-    return [...staticPages, ...productPages];
+    // 3. Pages Marques Dynamiques
+    const brands = await prisma.brand.findMany({
+      select: { slug: true, updatedAt: true },
+    });
+
+    const brandPages = brands.map((b) => ({
+      url: `${baseUrl}/produits?brand=${b.slug}`,
+      lastModified: b.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }));
+
+    // 4. Pages Catégories Dynamiques
+    const categories = await prisma.category.findMany({
+      select: { slug: true, updatedAt: true },
+    });
+
+    const categoryPages = categories.map((c) => ({
+      url: `${baseUrl}/produits?category=${c.slug}`,
+      lastModified: c.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }));
+
+    return [...staticPages, ...productPages, ...brandPages, ...categoryPages];
   } catch (error) {
     return staticPages;
   }
