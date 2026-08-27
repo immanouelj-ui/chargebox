@@ -1,0 +1,327 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  name          String?
+  role          String    @default("CUSTOMER") // "ADMIN", "CUSTOMER", "PRO"
+  
+  // B2B specific
+  companyName   String?
+  siret         String?
+  vatNumber     String?   // TVA intracommunautaire
+  phone         String?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  addresses     Address[]
+  orders        Order[]
+  cart          Cart?
+  reviews       Review[]
+
+  @@map("users")
+}
+
+model Address {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type          String   @default("SHIPPING") // "SHIPPING" or "BILLING"
+  isDefault     Boolean  @default(false)
+  
+  firstName     String
+  lastName      String
+  company       String?
+  street        String
+  complement    String?
+  postalCode    String
+  city          String
+  country       String   @default("France")
+  phone         String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("addresses")
+}
+
+model Brand {
+  id            String    @id @default(cuid())
+  name          String    @unique
+  slug          String    @unique
+  description   String?
+  logo          String?
+  bannerImage   String?
+  website       String?
+  originCountry String?   @default("Europe")
+  isFeatured    Boolean   @default(false)
+  displayOrder  Int       @default(0)
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  products      Product[]
+
+  @@map("brands")
+}
+
+model Category {
+  id            String     @id @default(cuid())
+  name          String     @unique
+  slug          String     @unique
+  description   String?
+  image         String?
+  displayOrder  Int        @default(0)
+
+  parentId      String?
+  parent        Category?  @relation("SubCategories", fields: [parentId], references: [id], onDelete: SetNull)
+  children      Category[] @relation("SubCategories")
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  products      Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id                  String   @id @default(cuid())
+  reference           String   @unique
+  sku                 String   @unique
+  slug                String   @unique
+  name                String
+  brandId             String
+  brand               Brand    @relation(fields: [brandId], references: [id], onDelete: Restrict)
+  categoryId          String
+  category            Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  shortDescription    String?
+  description         String
+  
+  // Pricing
+  priceHT             Float
+  priceTTC            Float
+  vatRate             Float    @default(20.0) // 20.0 for standard, 5.5 for IRVE pack
+  compareAtPrice      Float?   // Crossed out price
+  
+  // Inventory
+  stock               Int      @default(0)
+  inStock             Boolean  @default(true)
+  leadTimeDays        Int      @default(2) // Délai de livraison en jours ouvrés
+  
+  // Key Technical Specs (Indexed for instant filtering)
+  powerKw             Float    // e.g. 7.4, 11, 22
+  phaseType           String   @default("MONO") // "MONO", "TRI", "MONO_TRI"
+  connectorType       String   @default("T2S") // "T2S" (Prise avec obturateur), "ATTACHED_CABLE"
+  cableLengthMeters   Float?   // e.g. 5.0, 7.5
+  ipRating            String?  @default("IP55") // IP54, IP55, IP65
+  ikRating            String?  @default("IK10") // IK08, IK10
+  ocppVersion         String?  @default("1.6J") // "1.6J", "2.0.1"
+  hasDynamicLoad      Boolean  @default(false)  // Délestage dynamique / Power Management
+  hasSolarMode        Boolean  @default(false)  // Optimisation recharge solaire
+  hasWifi             Boolean  @default(true)
+  hasRfid             Boolean  @default(false)
+  has4G               Boolean  @default(false)
+
+  // Status & Visibility
+  isFeatured          Boolean  @default(false)
+  isBestSeller        Boolean  @default(false)
+  isActive            Boolean  @default(true)
+  isAdvenirEligible   Boolean  @default(true)
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  images              ProductImage[]
+  specifications      ProductSpecification[]
+  cartItems           CartItem[]
+  orderItems          OrderItem[]
+  reviews             Review[]
+
+  @@map("products")
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String?
+  isPrimary Boolean  @default(false)
+  order     Int      @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@map("product_images")
+}
+
+model ProductSpecification {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  group     String   // e.g. "Électrique", "Connectivité", "Boîtier", "Normes"
+  name      String   // e.g. "Tension nominale", "Protocole OCPP", "Garantie"
+  value     String   // e.g. "230V / 400V AC", "OCPP 1.6J JSON", "3 ans"
+  order     Int      @default(0)
+
+  @@map("product_specifications")
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String?    @unique
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String?    @unique
+  
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  items     CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int      @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId])
+  @@map("cart_items")
+}
+
+model Order {
+  id                    String      @id @default(cuid())
+  orderNumber           String      @unique
+  userId                String?
+  user                  User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  // Status
+  status                String      @default("PENDING") // PENDING, PAID, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+  paymentStatus         String      @default("UNPAID")  // UNPAID, PAID, FAILED, REFUNDED
+  
+  // Pricing Totals
+  subtotalHT            Float
+  taxAmount             Float
+  shippingCost          Float       @default(0.0)
+  discountAmount        Float       @default(0.0)
+  totalTTC              Float
+  
+  // Customer & Shipping Snapshot
+  customerEmail         String
+  customerName          String
+  customerPhone         String?
+  isB2B                 Boolean     @default(false)
+  companyName           String?
+  siret                 String?
+  vatNumber             String?
+  
+  shippingAddress       String      // Formatted JSON or text
+  billingAddress        String      // Formatted JSON or text
+  carrier               String?     @default("Chronopost / Geodis IRVE")
+  trackingNumber        String?
+  
+  installationRequested Boolean     @default(false)
+  notes                 String?
+
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  items                 OrderItem[]
+  payments              Payment[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String   @id @default(cuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  
+  productName String
+  productSku  String
+  unitPriceHT Float
+  unitPriceTTC Float
+  vatRate     Float
+  quantity    Int
+  totalHT     Float
+  totalTTC    Float
+
+  @@map("order_items")
+}
+
+model Payment {
+  id             String   @id @default(cuid())
+  orderId        String
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  provider       String   @default("STRIPE")
+  transactionId  String?
+  amount         Float
+  currency       String   @default("EUR")
+  status         String   @default("PENDING") // PENDING, SUCCEEDED, FAILED
+  paymentMethod  String?  // "card", "apple_pay", "sepa"
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("payments")
+}
+
+model Coupon {
+  id            String    @id @default(cuid())
+  code          String    @unique
+  description   String?
+  discountType  String    @default("PERCENT") // "PERCENT" or "FIXED"
+  value         Float     // e.g. 10 for 10%, or 50 for 50€
+  minSpend      Float?    @default(0.0)
+  maxUses       Int?
+  usedCount     Int       @default(0)
+  isActive      Boolean   @default(true)
+  validFrom     DateTime  @default(now())
+  validUntil    DateTime?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("coupons")
+}
+
+model Review {
+  id                  String   @id @default(cuid())
+  productId           String
+  product             Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId              String?
+  user                User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  authorName          String
+  rating              Int      // 1 to 5
+  title               String?
+  comment             String
+  isVerifiedPurchase  Boolean  @default(true)
+  isApproved          Boolean  @default(true)
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@map("reviews")
+}

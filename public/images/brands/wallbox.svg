@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" fill="none">
+  <rect width="200" height="60" rx="8" fill="#F8FAFC" />
+  <g transform="translate(18, 16)">
+    <!-- Wallbox green ring symbol -->
+    <circle cx="16" cy="14" r="12" stroke="#00C48C" stroke-width="4.5" />
+    <circle cx="16" cy="14" r="4.5" fill="#00C48C" />
+    <text x="38" y="21" font-family="system-ui, sans-serif" font-weight="800" font-size="20" fill="#0F172A" letter-spacing="-0.5">wallbox</text>
+  </g>
+</svg>

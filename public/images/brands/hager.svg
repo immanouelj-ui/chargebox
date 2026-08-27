@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" fill="none">
+  <rect width="200" height="60" rx="8" fill="#F8FAFC" />
+  <g transform="translate(30, 16)">
+    <text x="0" y="24" font-family="system-ui, sans-serif" font-weight="900" font-size="26" fill="#004B87" letter-spacing="-1">:hager</text>
+    <text x="96" y="24" font-family="system-ui, sans-serif" font-weight="700" font-size="14" fill="#00D26A" letter-spacing="1">witty</text>
+  </g>
+</svg>
