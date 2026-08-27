@@ -8,6 +8,7 @@ import { Search, ShoppingBag, User, Menu, X, ChevronDown, Zap, ShieldAlert } fro
 import { useCartStore } from "@/lib/store/useCartStore";
 import { SearchModal } from "./SearchModal";
 import { formatPrice } from "@/lib/utils";
+import { supabase } from "@/lib/supabaseClient";
 
 interface HeaderProps {
   user?: {
@@ -30,7 +31,8 @@ export function Header({ user }: HeaderProps) {
 
   useEffect(() => {
     setMounted(true);
-    // Fetch live session to keep header in sync with OAuth login
+
+    // 1. Fetch current backend session
     fetch("/api/auth/session")
       .then((r) => r.json())
       .then((d) => {
@@ -38,6 +40,30 @@ export function Header({ user }: HeaderProps) {
         else if (user) setCurrentUser(user);
       })
       .catch(() => {});
+
+    // 2. Listen to Supabase Google OAuth live events in the browser
+    const { data: authSub } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user?.email) {
+        const uEmail = session.user.email;
+        const uName = session.user.user_metadata?.full_name || uEmail.split("@")[0];
+
+        try {
+          const res = await fetch("/api/auth/sync-supabase-user", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: uEmail, name: uName }),
+          });
+          const d = await res.json();
+          if (d.user) setCurrentUser(d.user);
+        } catch (e) {}
+      } else if (event === "SIGNED_OUT") {
+        setCurrentUser(null);
+      }
+    });
+
+    return () => {
+      authSub?.subscription?.unsubscribe();
+    };
   }, [user]);
 
   const itemCount = mounted ? getItemCount() : 0;
