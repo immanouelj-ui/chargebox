@@ -6,10 +6,12 @@ import { Zap, Sparkles } from "lucide-react";
 import type { Metadata } from "next";
 import type { ProductWithDetails } from "@/types";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Catalogue Bornes de Recharge | Teltonika, Wallbox, V2C, Schneider | Chargebox",
   description:
-    "Découvrez notre catalogue complet de bornes de recharge pour véhicules électriques : Teltonika TeltoCharge, Wallbox Pulsar Max, V2C Trydan, Schneider Charge, Hager Witty, Legrand. Filtrez par puissance, marque et options solaires.",
+    "Découvrez notre catalogue complet de bornes de recharge pour véhicules électriques : Teltonika TeltoCharge, Wallbox Pulsar Max, V2C Trydan, Schneider Charge, Hager Witty, Legrand.",
 };
 
 interface ProduitsPageProps {
@@ -36,15 +38,12 @@ export default async function ProduitsPage({ searchParams }: ProduitsPageProps) 
     phase,
     connector,
     solar,
-    dynamic,
+    dynamic: isDynamic,
     lte,
     sort,
   } = searchParams;
 
-  // Build Prisma Where clause
-  const where: any = {
-    isActive: true,
-  };
+  const where: any = { isActive: true };
 
   if (search) {
     where.OR = [
@@ -55,69 +54,51 @@ export default async function ProduitsPage({ searchParams }: ProduitsPageProps) 
     ];
   }
 
-  if (brand) {
-    where.brand = { slug: brand };
-  }
+  if (brand) where.brand = { slug: brand };
+  if (category) where.category = { slug: category };
+  if (power) where.powerKw = parseFloat(power);
+  if (phase) where.phaseType = phase;
+  if (connector) where.connectorType = connector;
+  if (solar === "true") where.hasSolarMode = true;
+  if (isDynamic === "true") where.hasDynamicLoad = true;
+  if (lte === "true") where.has4G = true;
 
-  if (category) {
-    where.category = { slug: category };
-  }
-
-  if (power) {
-    where.powerKw = parseFloat(power);
-  }
-
-  if (phase) {
-    where.phaseType = phase;
-  }
-
-  if (connector) {
-    where.connectorType = connector;
-  }
-
-  if (solar === "true") {
-    where.hasSolarMode = true;
-  }
-
-  if (dynamic === "true") {
-    where.hasDynamicLoad = true;
-  }
-
-  if (lte === "true") {
-    where.has4G = true;
-  }
-
-  // Build OrderBy
   let orderBy: any = [{ isFeatured: "desc" }, { isBestSeller: "desc" }];
-  if (sort === "price-asc") {
-    orderBy = [{ priceTTC: "asc" }];
-  } else if (sort === "price-desc") {
-    orderBy = [{ priceTTC: "desc" }];
-  } else if (sort === "power-desc") {
-    orderBy = [{ powerKw: "desc" }, { priceTTC: "asc" }];
-  }
+  if (sort === "price-asc") orderBy = [{ priceTTC: "asc" }];
+  else if (sort === "price-desc") orderBy = [{ priceTTC: "desc" }];
+  else if (sort === "power-desc") orderBy = [{ powerKw: "desc" }, { priceTTC: "asc" }];
 
-  // Fetch data
-  const [products, brands, categories] = await Promise.all([
-    prisma.product.findMany({
-      where,
-      include: {
-        brand: true,
-        category: true,
-        images: { orderBy: { order: "asc" } },
-        specifications: { orderBy: { order: "asc" } },
-      },
-      orderBy,
-    }) as unknown as Promise<ProductWithDetails[]>,
-    prisma.brand.findMany({
-      select: { id: true, name: true, slug: true },
-      orderBy: { displayOrder: "asc" },
-    }),
-    prisma.category.findMany({
-      select: { id: true, name: true, slug: true },
-      orderBy: { displayOrder: "asc" },
-    }),
-  ]);
+  let products: ProductWithDetails[] = [];
+  let brands: any[] = [];
+  let categories: any[] = [];
+
+  try {
+    const [prods, brs, cats] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        include: {
+          brand: true,
+          category: true,
+          images: { orderBy: { order: "asc" } },
+          specifications: { orderBy: { order: "asc" } },
+        },
+        orderBy,
+      }) as unknown as Promise<ProductWithDetails[]>,
+      prisma.brand.findMany({
+        select: { id: true, name: true, slug: true },
+        orderBy: { displayOrder: "asc" },
+      }),
+      prisma.category.findMany({
+        select: { id: true, name: true, slug: true },
+        orderBy: { displayOrder: "asc" },
+      }),
+    ]);
+    products = prods;
+    brands = brs;
+    categories = cats;
+  } catch (e) {
+    console.warn("Could not fetch products for catalog:", e);
+  }
 
   return (
     <div className="bg-slate-50 min-h-screen py-10">

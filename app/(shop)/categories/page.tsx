@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { Home, Building2, Cable, ShieldAlert, Wrench, ArrowRight, Zap } from "lucide-react";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Catégories de Bornes & Équipements IRVE | Chargebox",
   description:
@@ -10,14 +12,20 @@ export const metadata: Metadata = {
 };
 
 export default async function CategoriesPage() {
-  const categories = await prisma.category.findMany({
-    include: {
-      products: {
-        where: { isActive: true },
+  let categories: any[] = [];
+
+  try {
+    categories = await prisma.category.findMany({
+      include: {
+        products: {
+          where: { isActive: true },
+        },
       },
-    },
-    orderBy: { displayOrder: "asc" },
-  });
+      orderBy: { displayOrder: "asc" },
+    });
+  } catch (e) {
+    console.warn("Could not fetch categories:", e);
+  }
 
   return (
     <div className="bg-slate-50 min-h-screen py-12">
@@ -47,7 +55,7 @@ export default async function CategoriesPage() {
                     <Zap className="w-6 h-6" />
                   </div>
                   <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
-                    {cat.products.length} produit{cat.products.length > 1 ? "s" : ""}
+                    {cat.products?.length || 0} produit{cat.products?.length > 1 ? "s" : ""}
                   </span>
                 </div>
 

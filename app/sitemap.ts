@@ -25,18 +25,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route === "" ? 1.0 : 0.8,
   }));
 
-  // Dynamic Product Pages
-  const products = await prisma.product.findMany({
-    where: { isActive: true },
-    select: { slug: true, updatedAt: true },
-  });
+  try {
+    const products = await prisma.product.findMany({
+      where: { isActive: true },
+      select: { slug: true, updatedAt: true },
+    });
 
-  const productPages = products.map((p) => ({
-    url: `${baseUrl}/produits/${p.slug}`,
-    lastModified: p.updatedAt,
-    changeFrequency: "daily" as const,
-    priority: 0.9,
-  }));
+    const productPages = products.map((p) => ({
+      url: `${baseUrl}/produits/${p.slug}`,
+      lastModified: p.updatedAt,
+      changeFrequency: "daily" as const,
+      priority: 0.9,
+    }));
 
-  return [...staticPages, ...productPages];
+    return [...staticPages, ...productPages];
+  } catch (error) {
+    return staticPages;
+  }
 }

@@ -9,29 +9,35 @@ import { IrveInstallationBanner } from "@/components/home/IrveInstallationBanner
 import { FaqSection } from "@/components/home/FaqSection";
 import type { ProductWithDetails } from "@/types";
 
-export const revalidate = 60; // ISR revalidation
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const products = (await prisma.product.findMany({
-    where: {
-      isActive: true,
-    },
-    include: {
-      brand: true,
-      category: true,
-      images: {
-        orderBy: { order: "asc" },
+  let products: ProductWithDetails[] = [];
+
+  try {
+    products = (await prisma.product.findMany({
+      where: {
+        isActive: true,
       },
-      specifications: {
-        orderBy: { order: "asc" },
+      include: {
+        brand: true,
+        category: true,
+        images: {
+          orderBy: { order: "asc" },
+        },
+        specifications: {
+          orderBy: { order: "asc" },
+        },
       },
-    },
-    orderBy: [
-      { isFeatured: "desc" },
-      { isBestSeller: "desc" },
-      { createdAt: "desc" },
-    ],
-  })) as unknown as ProductWithDetails[];
+      orderBy: [
+        { isFeatured: "desc" },
+        { isBestSeller: "desc" },
+        { createdAt: "desc" },
+      ],
+    })) as unknown as ProductWithDetails[];
+  } catch (e) {
+    console.warn("Could not fetch products for home page:", e);
+  }
 
   return (
     <div className="flex flex-col min-h-screen">

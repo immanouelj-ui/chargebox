@@ -1,24 +1,32 @@
 import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
-import { ArrowRight, Zap, CheckCircle2, ShieldCheck } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import type { Metadata } from "next";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Marques Partenaires | Teltonika, Wallbox, V2C, Schneider, Hager, Legrand | Chargebox",
   description:
-    "Découvrez les marques officielles partenaires de Chargebox : Teltonika Energy, Wallbox, V2C, Schneider Electric, Hager Witty et Legrand. Spécifications réelles et garanties constructeur.",
+    "Découvrez les marques officielles partenaires de Chargebox : Teltonika Energy, Wallbox, V2C, Schneider Electric, Hager Witty et Legrand.",
 };
 
 export default async function MarquesPage() {
-  const brands = await prisma.brand.findMany({
-    orderBy: { displayOrder: "asc" },
-    include: {
-      products: {
-        where: { isActive: true },
+  let brands: any[] = [];
+
+  try {
+    brands = await prisma.brand.findMany({
+      orderBy: { displayOrder: "asc" },
+      include: {
+        products: {
+          where: { isActive: true },
+        },
       },
-    },
-  });
+    });
+  } catch (e) {
+    console.warn("Could not fetch brands:", e);
+  }
 
   return (
     <div className="bg-slate-50 min-h-screen py-12">
@@ -69,7 +77,7 @@ export default async function MarquesPage() {
 
                 <div className="text-xs text-brand-700 font-semibold flex items-center gap-1.5 pt-2">
                   <CheckCircle2 className="w-4 h-4 text-brand-600" />
-                  <span>{brand.products.length} modèle{brand.products.length > 1 ? "s" : ""} certifié{brand.products.length > 1 ? "s" : ""} en stock</span>
+                  <span>{brand.products?.length || 0} modèle{brand.products?.length > 1 ? "s" : ""} certifié{brand.products?.length > 1 ? "s" : ""} en stock</span>
                 </div>
               </div>
 
