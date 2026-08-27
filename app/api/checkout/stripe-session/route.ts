@@ -113,7 +113,7 @@ export async function POST(req: Request) {
         installationRequested: String(Boolean(installationRequested)),
       },
       success_url: `${origin}/checkout/confirmation?session_id={CHECKOUT_SESSION_ID}&order_id=${order.id}`,
-      cancel_url: `${origin}/checkout?canceled=true`,
+      cancel_url: `${origin}/checkout/echec?order_id=${order.id}`,
     });
 
     return NextResponse.json({

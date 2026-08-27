@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { Package, MapPin, User, LogOut, LayoutDashboard, Shield } from "lucide-react";
+import { LogoutButton } from "@/components/auth/LogoutButton";
 
 export default async function ClientAccountLayout({
   children,
@@ -84,15 +85,7 @@ export default async function ClientAccountLayout({
             </Link>
 
             <div className="pt-2 border-t border-slate-100 mt-2">
-              <form action="/api/auth/logout" method="POST">
-                <button
-                  type="submit"
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition text-left"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>Déconnexion</span>
-                </button>
-              </form>
+              <LogoutButton />
             </div>
           </div>
 
