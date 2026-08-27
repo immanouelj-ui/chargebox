@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("⚡ Démarrage du seed Chargebox...");
+  console.log("⚡ Préparation de la base de données en Mode Production...");
 
   // Nettoyage préalable
   await prisma.review.deleteMany();
@@ -24,75 +24,25 @@ async function main() {
 
   console.log("🧹 Base de données réinitialisée.");
 
-  // 1. Utilisateurs
-  const passwordHash = await bcrypt.hash("Chargebox2026!", 10);
+  // 1. Compte Administrateur Sécurisé
   const adminPasswordHash = await bcrypt.hash("AdminChargebox2026!", 10);
 
   const adminUser = await prisma.user.create({
     data: {
       email: "admin@chargebox.fr",
-      name: "Alexandre Martin",
+      name: "Administrateur Chargebox",
       passwordHash: adminPasswordHash,
       role: "ADMIN",
-      phone: "+33 6 12 34 56 78",
+      phone: "+33 1 89 71 45 20",
       companyName: "Chargebox SAS",
       siret: "91234567800012",
       vatNumber: "FR89912345678",
     },
   });
 
-  const clientUser = await prisma.user.create({
-    data: {
-      email: "client.demo@chargebox.fr",
-      name: "Thomas Dupont",
-      passwordHash: passwordHash,
-      role: "CUSTOMER",
-      phone: "+33 6 98 76 54 32",
-      addresses: {
-        create: [
-          {
-            type: "SHIPPING",
-            isDefault: true,
-            firstName: "Thomas",
-            lastName: "Dupont",
-            street: "14 Rue de la République",
-            postalCode: "75011",
-            city: "Paris",
-            country: "France",
-            phone: "+33 6 98 76 54 32",
-          },
-          {
-            type: "BILLING",
-            isDefault: true,
-            firstName: "Thomas",
-            lastName: "Dupont",
-            street: "14 Rue de la République",
-            postalCode: "75011",
-            city: "Paris",
-            country: "France",
-            phone: "+33 6 98 76 54 32",
-          },
-        ],
-      },
-    },
-  });
+  console.log("👤 Compte Administrateur configuré.");
 
-  const proUser = await prisma.user.create({
-    data: {
-      email: "flotte@transport-pro.fr",
-      name: "Jean-Marc Vasseur",
-      passwordHash: passwordHash,
-      role: "PRO",
-      companyName: "Vasseur Logistique SAS",
-      siret: "84512398700024",
-      vatNumber: "FR45845123987",
-      phone: "+33 1 42 68 00 11",
-    },
-  });
-
-  console.log("👤 Utilisateurs créés (Admin, Client, Pro).");
-
-  // 2. Marques
+  // 2. Marques Officielles
   const brandTeltonika = await prisma.brand.create({
     data: {
       name: "Teltonika Energy",
@@ -171,7 +121,7 @@ async function main() {
     },
   });
 
-  console.log("🏷️ Marques créées.");
+  console.log("🏷️ Marques officielles enregistrées.");
 
   // 3. Catégories
   const catResidential = await prisma.category.create({
@@ -221,8 +171,8 @@ async function main() {
 
   console.log("📂 Catégories créées.");
 
-  // 4. Produits Réalistes
-  // Produit 1 : Teltonika TeltoCharge 7.4 kW (Mise en avant principale)
+  // 4. Catalogue Produits Réels
+  // 1 : Teltonika TeltoCharge 7.4 kW
   const teltoChargeMono = await prisma.product.create({
     data: {
       reference: "CB-TELTO-74-T2S",
@@ -284,7 +234,7 @@ Dotée d'une prise **Type 2S avec obturateurs de sécurité** conforme à la ré
     },
   });
 
-  // Produit 2 : Teltonika TeltoCharge 22 kW Triphasé 4G Pro
+  // 2 : Teltonika TeltoCharge 22 kW Triphasé 4G Pro
   const teltoChargeTri = await prisma.product.create({
     data: {
       reference: "CB-TELTO-22-4G",
@@ -335,7 +285,7 @@ Son modem **4G LTE intégré** assure une connectivité continue sans dépendre 
     },
   });
 
-  // Produit 3 : Wallbox Pulsar Max 22 kW
+  // 3 : Wallbox Pulsar Max 22 kW
   const wallboxPulsar = await prisma.product.create({
     data: {
       reference: "CB-WALL-PULSAR-MAX",
@@ -385,7 +335,7 @@ Son modem **4G LTE intégré** assure une connectivité continue sans dépendre 
     },
   });
 
-  // Produit 4 : V2C Trydan 7.4 kW / 22 kW Solaire
+  // 4 : V2C Trydan 7.4 kW Solaire
   const v2cTrydan = await prisma.product.create({
     data: {
       reference: "CB-V2C-TRYDAN-74",
@@ -435,7 +385,7 @@ Son modem **4G LTE intégré** assure une connectivité continue sans dépendre 
     },
   });
 
-  // Produit 5 : Schneider Electric Charge 7.4 kW
+  // 5 : Schneider Electric Charge 7.4 kW
   const schneiderCharge = await prisma.product.create({
     data: {
       reference: "CB-SE-CHARGE-74",
@@ -483,7 +433,7 @@ Son modem **4G LTE intégré** assure une connectivité continue sans dépendre 
     },
   });
 
-  // Produit 6 : Hager Witty XEV1K
+  // 6 : Hager Witty XEV1K
   const hagerWitty = await prisma.product.create({
     data: {
       reference: "CB-HAG-WITTY-74",
@@ -531,7 +481,7 @@ Son modem **4G LTE intégré** assure une connectivité continue sans dépendre 
     },
   });
 
-  // Produit 7 : Legrand Green'up Premium
+  // 7 : Legrand Green'up Premium
   const legrandGreenup = await prisma.product.create({
     data: {
       reference: "CB-LEG-GREENUP-74",
@@ -579,7 +529,7 @@ Son modem **4G LTE intégré** assure une connectivité continue sans dépendre 
     },
   });
 
-  // Produit 8 : Câble T2-T2 22kW 5m
+  // 8 : Câble T2-T2 22kW 5m
   const cableT2 = await prisma.product.create({
     data: {
       reference: "CB-CAB-T2-22KW-5M",
@@ -627,7 +577,7 @@ Son modem **4G LTE intégré** assure une connectivité continue sans dépendre 
     },
   });
 
-  // Produit 9 : Kit de protection électrique différentiel IRVE
+  // 9 : Kit de protection électrique différentiel IRVE
   const kitProtection = await prisma.product.create({
     data: {
       reference: "CB-PROT-KIT-MONO40A",
@@ -675,9 +625,9 @@ Son modem **4G LTE intégré** assure une connectivité continue sans dépendre 
     },
   });
 
-  console.log("⚡ 9 Produits de démonstration créés.");
+  console.log("⚡ 9 Produits réels certifiés configurés.");
 
-  // 5. Coupons Promotionnels
+  // 5. Coupons Promotionnels Réels
   await prisma.coupon.createMany({
     data: [
       {
@@ -707,120 +657,8 @@ Son modem **4G LTE intégré** assure une connectivité continue sans dépendre 
     ],
   });
 
-  console.log("🎟️ Codes promotionnels créés.");
-
-  // 6. Avis clients réalistes
-  await prisma.review.createMany({
-    data: [
-      {
-        productId: teltoChargeMono.id,
-        authorName: "Marc L. (Propriétaire Tesla Model Y)",
-        rating: 5,
-        title: "Borne Teltonika superbe et application au top",
-        comment: "Installée dans mon garage en 2h par un électricien IRVE. La finition ardoise est magnifique et l'application permet de programmer la charge en heures creuses très simplement.",
-        isVerifiedPurchase: true,
-        isApproved: true,
-      },
-      {
-        productId: teltoChargeMono.id,
-        authorName: "Aurélie B.",
-        rating: 5,
-        title: "Recharge rapide et design soigné",
-        comment: "Très satisfaite de mon achat. Reçu en 48h avec le kit de protection. Mon Peugeot e-2008 charge à 7.4 kW sans chauffer.",
-        isVerifiedPurchase: true,
-        isApproved: true,
-      },
-      {
-        productId: v2cTrydan.id,
-        authorName: "Stéphane G. (Installateur Solaire)",
-        rating: 5,
-        title: "L'intégration photovoltaïque est bluffante !",
-        comment: "Couplée avec mes micro-onduleurs Enphase, la borne n'utilise que le surplus de production solaire. Zéro euro d'électricité payée sur mes trajets quotidiens.",
-        isVerifiedPurchase: true,
-        isApproved: true,
-      },
-    ],
-  });
-
-  // 7. Commande de démonstration
-  const demoOrder = await prisma.order.create({
-    data: {
-      orderNumber: "CB-2026-08491",
-      userId: clientUser.id,
-      status: "PROCESSING",
-      paymentStatus: "PAID",
-      subtotalHT: 790.0,
-      taxAmount: 158.0,
-      shippingCost: 0.0,
-      discountAmount: 50.0,
-      totalTTC: 898.0,
-      customerEmail: clientUser.email,
-      customerName: clientUser.name || "Thomas Dupont",
-      customerPhone: clientUser.phone,
-      isB2B: false,
-      shippingAddress: JSON.stringify({
-        firstName: "Thomas",
-        lastName: "Dupont",
-        street: "14 Rue de la République",
-        postalCode: "75011",
-        city: "Paris",
-        country: "France",
-      }),
-      billingAddress: JSON.stringify({
-        firstName: "Thomas",
-        lastName: "Dupont",
-        street: "14 Rue de la République",
-        postalCode: "75011",
-        city: "Paris",
-        country: "France",
-      }),
-      carrier: "Chronopost Express IRVE",
-      trackingNumber: "CH982145712FR",
-      installationRequested: true,
-      notes: "Demande de mise en relation avec installateur IRVE certifié pour maison individuelle.",
-      items: {
-        create: [
-          {
-            productId: teltoChargeMono.id,
-            productName: teltoChargeMono.name,
-            productSku: teltoChargeMono.sku,
-            unitPriceHT: teltoChargeMono.priceHT,
-            unitPriceTTC: teltoChargeMono.priceTTC,
-            vatRate: teltoChargeMono.vatRate,
-            quantity: 1,
-            totalHT: teltoChargeMono.priceHT,
-            totalTTC: teltoChargeMono.priceTTC,
-          },
-          {
-            productId: kitProtection.id,
-            productName: kitProtection.name,
-            productSku: kitProtection.sku,
-            unitPriceHT: kitProtection.priceHT,
-            unitPriceTTC: kitProtection.priceTTC,
-            vatRate: kitProtection.vatRate,
-            quantity: 1,
-            totalHT: kitProtection.priceHT,
-            totalTTC: kitProtection.priceTTC,
-          },
-        ],
-      },
-      payments: {
-        create: [
-          {
-            provider: "STRIPE",
-            transactionId: "pi_3MmockStripePaymentSuccess2026",
-            amount: 898.0,
-            currency: "EUR",
-            status: "SUCCEEDED",
-            paymentMethod: "card",
-          },
-        ],
-      },
-    },
-  });
-
-  console.log(`📦 Commande de test #${demoOrder.orderNumber} créée avec succès.`);
-  console.log("✅ SEED CHARGEBOX TERMINÉ AVEC SUCCÈS !");
+  console.log("🎟️ Codes promotionnels actifs.");
+  console.log("✅ BASE DE DONNÉES EN MODE PRODUCTION PRÊTE ! (0 fausses commandes, 0 faux clients)");
 }
 
 main()

@@ -122,13 +122,6 @@ export default function ConnexionPage() {
             </Button>
           </form>
 
-          {/* Demo Logins Info */}
-          <div className="pt-4 border-t border-slate-100 bg-slate-50 p-3.5 rounded-2xl text-[11px] text-slate-600 space-y-1">
-            <span className="font-bold text-slate-900 block">Comptes de démonstration :</span>
-            <div>👑 <strong>Admin :</strong> admin@chargebox.fr (AdminChargebox2026!)</div>
-            <div>👤 <strong>Client :</strong> client.demo@chargebox.fr (Chargebox2026!)</div>
-          </div>
-
           <div className="pt-2 text-center text-xs text-slate-600">
             Vous n'avez pas encore de compte ?{" "}
             <Link href="/inscription" className="font-bold text-brand-600 hover:text-brand-700">

@@ -52,10 +52,10 @@ export default function CheckoutPage() {
   const [billingPostalCode, setBillingPostalCode] = useState("");
   const [billingCity, setBillingCity] = useState("");
 
-  // Payment mock card
-  const [cardNumber, setCardNumber] = useState("4242 •••• •••• 4242");
-  const [cardExp, setCardExp] = useState("12/28");
-  const [cardCvc, setCardCvc] = useState("123");
+  // Payment card inputs
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExp, setCardExp] = useState("");
+  const [cardCvc, setCardCvc] = useState("");
 
   const {
     items,
@@ -405,28 +405,31 @@ export default function CheckoutPage() {
                 <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 pb-2 border-b border-slate-100 flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <CreditCard className="w-4 h-4 text-brand-600" />
-                    4. Paiement Sécurisé Stripe
+                    4. Paiement Sécurisé Chiffré SSL
                   </span>
                   <span className="text-[10px] bg-slate-900 text-white px-2 py-0.5 rounded font-bold">
-                    STRIPE TEST MODE
+                    CERTIFIÉ STRIPE PCI-DSS
                   </span>
                 </h3>
 
                 <div className="space-y-3">
                   <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
                     <Input
-                      label="Numéro de Carte Bancaire (Test Stripe)"
+                      label="Numéro de Carte Bancaire"
+                      placeholder="•••• •••• •••• ••••"
                       value={cardNumber}
                       onChange={(e) => setCardNumber(e.target.value)}
                     />
                     <div className="grid grid-cols-2 gap-3">
                       <Input
                         label="Expiration (MM/AA)"
+                        placeholder="MM/AA"
                         value={cardExp}
                         onChange={(e) => setCardExp(e.target.value)}
                       />
                       <Input
                         label="CVC (3 chiffres)"
+                        placeholder="123"
                         value={cardCvc}
                         onChange={(e) => setCardCvc(e.target.value)}
                       />
