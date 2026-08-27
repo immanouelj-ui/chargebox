@@ -18,9 +18,9 @@ export async function POST(req: Request) {
       where: { email: email.toLowerCase().trim() },
     });
 
-    if (!user) {
+    if (!user || !user.passwordHash) {
       return NextResponse.json(
-        { error: "Identifiants invalides." },
+        { error: !user ? "Identifiants invalides." : "Ce compte a été créé avec Google. Veuillez vous connecter avec le bouton Google." },
         { status: 401 }
       );
     }

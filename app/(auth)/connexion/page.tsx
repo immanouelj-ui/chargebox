@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Lock, Mail, ArrowRight, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 
 export default function ConnexionPage() {
   const router = useRouter();
@@ -121,6 +122,17 @@ export default function ConnexionPage() {
               <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
           </form>
+
+          {/* Social Login Divider */}
+          <div className="relative flex items-center justify-center my-4">
+            <div className="border-t border-slate-200 w-full" />
+            <span className="bg-white px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+              ou
+            </span>
+            <div className="border-t border-slate-200 w-full" />
+          </div>
+
+          <GoogleAuthButton label="Continuer avec Google" />
 
           <div className="pt-2 text-center text-xs text-slate-600">
             Vous n'avez pas encore de compte ?{" "}
