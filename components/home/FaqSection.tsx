@@ -24,9 +24,9 @@ export function FaqSection() {
         "Le délestage dynamique permet à la borne de mesurer en direct la consommation totale de votre logement via une pince ampèremétrique ou la télé-information Linky (TIC). Si un four ou une pompe à chaleur s'allume, la borne réduit automatiquement sa vitesse de charge pour éviter que votre disjoncteur général ne disjoncte.",
     },
     {
-      question: "Comment bénéficier du crédit d'impôt de 500 € pour l'installation d'une borne ?",
+      question: "Comment se déroule la demande de devis pour l'installation IRVE ?",
       answer:
-        "Le crédit d'impôt pour la transition énergétique est ouvert à tous les particuliers (propriétaires, locataires ou occupants à titre gratuit) pour leur résidence principale ou secondaire. La borne doit être installée par un professionnel certifié IRVE et doit être pilotable (connectée / programmable). Chargebox vous fournit une facture conforme pour votre déclaration fiscale.",
+        "Lors de votre commande sur Chargebox ou via notre page Contact, vous pouvez demander un devis de pose. Un artisan électricien qualifié IRVE de votre secteur prend contact avec vous sous 24h pour étudier votre tableau électrique et vous proposer un devis d'installation sur-mesure gratuit et sans engagement.",
     },
     {
       question: "Quelle protection électrique est obligatoire pour une borne de recharge ?",

@@ -128,7 +128,7 @@ export default async function ProduitsPage({ searchParams }: ProduitsPageProps) 
                   : "Catalogue des Bornes de Recharge"}
               </h1>
               <p className="text-xs sm:text-sm text-slate-600 mt-1">
-                {products.length} produit{products.length > 1 ? "s" : ""} disponible{products.length > 1 ? "s" : ""} avec livraison rapide et éligibilité crédit d'impôt
+                {products.length} produit{products.length > 1 ? "s" : ""} disponible{products.length > 1 ? "s" : ""} avec expédition 24/48h et garantie constructeur 3 ans
               </p>
             </div>
 

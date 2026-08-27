@@ -44,11 +44,11 @@ export function HeroSection() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 text-sm text-slate-200">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-brand-400 flex-shrink-0" />
-                <span>Éligible au crédit d'impôt 500 €</span>
+                <span>Garantie 3 ans constructeur</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-brand-400 flex-shrink-0" />
-                <span>Réseau d'installateurs qualifiés IRVE</span>
+                <span>Installation IRVE sur devis gratuit</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-brand-400 flex-shrink-0" />

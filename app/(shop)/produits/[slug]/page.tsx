@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     title: `${product.name} | Chargebox France`,
     description:
       product.shortDescription ||
-      `Achetez la borne de recharge ${product.name} chez Chargebox. Puissance ${product.powerKw} kW, éligible crédit d'impôt 500 € et installation qualifiée IRVE partout en France.`,
+      `Achetez la borne de recharge ${product.name} chez Chargebox. Puissance ${product.powerKw} kW, garantie 3 ans constructeur et pose par électricien qualifié IRVE sur devis gratuit.`,
     openGraph: {
       title: product.name,
       description: product.shortDescription || undefined,

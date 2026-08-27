@@ -204,7 +204,7 @@ export default function PanierPage() {
                 ))}
               </div>
 
-              {/* Forfait Installation IRVE Option toggle */}
+              {/* Demande de Devis Installation IRVE */}
               <div
                 onClick={() => setInstallationOption(!installationOption)}
                 className={`p-5 rounded-2xl border-2 transition cursor-pointer flex items-start gap-4 ${
@@ -223,12 +223,14 @@ export default function PanierPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
                       <Wrench className="w-4 h-4 text-brand-600" />
-                      Ajouter le Forfait Pose par Installateur Certifié IRVE
+                      Demander un devis pour la pose par un installateur certifié IRVE
                     </span>
-                    <span className="text-sm font-black text-brand-700">+590,00 € TTC</span>
+                    <span className="text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+                      Devis Gratuit
+                    </span>
                   </div>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Installation complète conforme NF C 15-100 avec pose, raccordement au tableau et transmission de l'attestation Consuel / IRVE indispensable pour le <strong>crédit d'impôt de 500 €</strong>.
+                    Un artisan électricien qualifié IRVE partenaire prendra contact avec vous sous 24h pour établir un devis personnalisé de raccordement.
                   </p>
                 </div>
               </div>
@@ -254,9 +256,9 @@ export default function PanierPage() {
                   </div>
                   
                   {installationOption && (
-                    <div className="flex justify-between text-brand-800 font-medium">
-                      <span>Forfait Pose IRVE</span>
-                      <span>{formatPrice(installation)}</span>
+                    <div className="flex justify-between text-emerald-700 font-semibold">
+                      <span>Option Devis Pose IRVE</span>
+                      <span>Gratuit (Sur Devis)</span>
                     </div>
                   )}
 

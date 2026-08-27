@@ -36,9 +36,9 @@ export default async function MonCompteDashboardPage() {
           <div className="text-2xl font-black text-slate-900">{recentOrders.length}</div>
         </div>
 
-        <div className="p-5 rounded-2xl bg-brand-50/60 border border-brand-200/80 space-y-1">
-          <span className="text-xs font-bold text-brand-800 uppercase">Crédit d'impôt éligible</span>
-          <div className="text-2xl font-black text-brand-700">500,00 €</div>
+        <div className="p-5 rounded-2xl bg-emerald-50/60 border border-emerald-200/80 space-y-1">
+          <span className="text-xs font-bold text-emerald-800 uppercase">Assistance Technique</span>
+          <div className="text-2xl font-black text-emerald-700">Prioritaire</div>
         </div>
 
         <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">

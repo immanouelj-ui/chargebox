@@ -21,7 +21,7 @@ export default function SimulateurBornePage() {
     price: 749.00,
     image: "/images/products/teltonika-teltocharge.jpg",
     badge: "Choix Idéal pour Maison Individuelle",
-    reason: "Design scandinave personnalisable, délestage dynamique intelligent et éligibilité crédit d'impôt de 500 €.",
+    reason: "Design scandinave personnalisable, délestage dynamique intelligent et garantie constructeur 3 ans.",
   };
 
   if (solar) {

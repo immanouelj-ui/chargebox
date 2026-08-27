@@ -9,7 +9,7 @@ import { getCurrentUser } from "@/lib/auth";
 export const metadata: Metadata = {
   title: "Chargebox | Bornes de Recharge Véhicules Électriques & Accessoires IRVE",
   description:
-    "Boutique e-commerce experte en bornes de recharge pour véhicules électriques et hybrides. Découvrez la gamme Teltonika Energy, Wallbox, V2C, Schneider, Hager et Legrand. Éligibilité crédit d'impôt 500 € et réseau de poseurs IRVE.",
+    "Boutique e-commerce experte en bornes de recharge pour véhicules électriques et hybrides. Découvrez la gamme Teltonika Energy, Wallbox, V2C, Schneider, Hager et Legrand. Réseau d'installateurs IRVE qualifiés sur devis gratuit.",
   keywords: [
     "borne de recharge",
     "Teltonika TeltoCharge",
@@ -18,8 +18,8 @@ export const metadata: Metadata = {
     "borne recharge voiture électrique",
     "borne 7.4 kW",
     "borne 22 kW triphasé",
-    "crédit d'impôt borne de recharge",
-    "installation IRVE",
+    "installation IRVE devis",
+    "pose borne électricien IRVE",
     "câble type 2",
     "protection différentiel type F",
   ],

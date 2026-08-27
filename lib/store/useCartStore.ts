@@ -6,7 +6,7 @@ export interface CartStore {
   items: CartItemType[];
   isDrawerOpen: boolean;
   appliedCoupon: AppliedCoupon | null;
-  installationOption: boolean; // Forfait pose certifiée IRVE
+  installationOption: boolean; // Demande de devis installation IRVE
   
   // Actions
   addItem: (item: Omit<CartItemType, "quantity" | "id">, quantity?: number) => void;
@@ -33,7 +33,6 @@ export interface CartStore {
 
 const FREE_SHIPPING_THRESHOLD = 300; // Livraison offerte dès 300€
 const STANDARD_SHIPPING_COST = 14.90;
-const IRVE_INSTALLATION_PACKAGE_PRICE = 590.0; // Forfait installation standard IRVE TTC
 
 export const useCartStore = create<CartStore>()(
   persist(
@@ -118,7 +117,7 @@ export const useCartStore = create<CartStore>()(
       },
 
       getInstallationCost: () => {
-        return get().installationOption ? IRVE_INSTALLATION_PACKAGE_PRICE : 0;
+        return 0; // L'installation est désormais 100% sur demande de devis personnalisé gratuit
       },
 
       getShippingCost: () => {
@@ -150,9 +149,8 @@ export const useCartStore = create<CartStore>()(
         const subtotal = get().getSubtotalTTC();
         const shipping = get().getShippingCost();
         const discount = get().getDiscountAmount();
-        const installation = get().getInstallationCost();
 
-        return Math.max(0, subtotal + shipping + installation - discount);
+        return Math.max(0, subtotal + shipping - discount);
       },
     }),
     {

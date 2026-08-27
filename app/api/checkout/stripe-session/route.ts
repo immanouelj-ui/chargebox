@@ -48,22 +48,6 @@ export async function POST(req: Request) {
       quantity: item.quantity,
     }));
 
-    // If IRVE installation was requested (+590€ TTC)
-    if (installationRequested) {
-      stripeLineItems.push({
-        price_data: {
-          currency: "eur",
-          product_data: {
-            name: "Forfait Installation Borne de Recharge Certifié IRVE",
-            description: "Pose complète par électricien agréé IRVE + protection différentielle + mise en service NF C 15-100",
-            images: [`${origin}/images/products/protection-kit-irve.jpg`],
-          },
-          unit_amount: 59000, // 590.00 € in cents
-        },
-        quantity: 1,
-      });
-    }
-
     const user = await getCurrentUser();
     const order = await prisma.order.create({
       data: {

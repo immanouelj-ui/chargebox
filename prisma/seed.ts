@@ -128,7 +128,7 @@ async function main() {
     data: {
       name: "Bornes Résidentielles",
       slug: "bornes-residentielles",
-      description: "Bornes de recharge 7.4 kW et 11 kW idéales pour maisons individuelles et copropriétés avec éligibilité crédit d'impôt.",
+      description: "Bornes de recharge 7.4 kW et 11 kW idéales pour maisons individuelles et copropriétés avec délestage intelligent et garantie 3 ans.",
       displayOrder: 1,
     },
   });
@@ -191,7 +191,7 @@ Dotée d'une prise **Type 2S avec obturateurs de sécurité** conforme à la ré
 - **Connectivité complète** : Application mobile Teltonika Energy (iOS/Android) via Bluetooth, Wi-Fi et Ethernet.
 - **Protocole OCPP 1.6J** : Intégration transparente avec tous les opérateurs de recharge.
 - **Robustesse certifiée** : Indice IP55 (étanchéité totale extérieur) et résistance aux chocs IK10.
-- **Éligibilité aides** : Crédit d'impôt de 500 € et Prime Advenir.`,
+- **Sécurité & Normes** : Conformité NF C 15-100 et éligibilité Prime Advenir.`,
       priceHT: 624.17,
       priceTTC: 749.00,
       vatRate: 20.0,

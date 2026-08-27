@@ -6,7 +6,7 @@ export function CategoryGrid() {
     {
       title: "Bornes Résidentielles",
       slug: "bornes-residentielles",
-      description: "Puissances 7.4 kW et 11 kW idéales pour maisons et copropriétés avec crédit d'impôt.",
+      description: "Puissances 7.4 kW et 11 kW idéales pour maisons et copropriétés avec délestage intelligent.",
       icon: Home,
       count: "6 modèles",
       gradient: "from-emerald-500/10 to-teal-500/10",

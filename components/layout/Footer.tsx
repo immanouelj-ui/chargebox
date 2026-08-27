@@ -40,12 +40,12 @@ export function Footer() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-amber-500/10 text-amber-400 rounded-2xl border border-amber-500/20">
-                <Award className="w-6 h-6" />
+              <div className="p-3 bg-emerald-500/10 text-emerald-400 rounded-2xl border border-emerald-500/20">
+                <Wrench className="w-6 h-6" />
               </div>
               <div>
-                <h4 className="font-bold text-white text-base">Crédit d'Impôt 500 €</h4>
-                <p className="text-xs text-slate-400 mt-1">Éligible au crédit d'impôt transition énergétique de 500 €.</p>
+                <h4 className="font-bold text-white text-base">Pose IRVE sur Devis</h4>
+                <p className="text-xs text-slate-400 mt-1">Mise en relation avec un électricien qualifié IRVE sur devis gratuit.</p>
               </div>
             </div>
           </div>

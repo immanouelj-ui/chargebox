@@ -215,7 +215,7 @@ export default function CheckoutPage() {
                     <User className="w-5 h-5 text-brand-600" />
                     <div>
                       <span className="block text-xs font-bold">Particulier (B2C)</span>
-                      <span className="text-[10px] text-slate-500">Crédit d'impôt 500 €</span>
+                      <span className="text-[10px] text-slate-500">Facture nominative &amp; Garantie 3 ans</span>
                     </div>
                   </button>
 
@@ -458,9 +458,9 @@ export default function CheckoutPage() {
                     <span className="font-semibold text-slate-900">{formatPrice(taxAmount)}</span>
                   </div>
                   {installationOption && (
-                    <div className="flex justify-between text-brand-800 font-medium">
-                      <span>Forfait Pose IRVE</span>
-                      <span>{formatPrice(installation)}</span>
+                    <div className="flex justify-between text-emerald-700 font-semibold">
+                      <span>Option Devis Pose IRVE</span>
+                      <span>Gratuit (Sur Devis)</span>
                     </div>
                   )}
                   {discount > 0 && (

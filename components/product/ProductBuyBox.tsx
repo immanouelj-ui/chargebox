@@ -120,7 +120,7 @@ export function ProductBuyBox({ product }: ProductBuyBoxProps) {
         </div>
       </div>
 
-      {/* Option Forfait Pose IRVE */}
+      {/* Option Demande de Devis Installation IRVE */}
       <div
         onClick={() => setWithInstallation(!withInstallation)}
         className={`p-4 rounded-2xl border-2 transition cursor-pointer flex items-start gap-3 ${
@@ -139,12 +139,14 @@ export function ProductBuyBox({ product }: ProductBuyBoxProps) {
           <div className="flex items-center justify-between font-bold text-slate-900">
             <span className="flex items-center gap-1.5">
               <Wrench className="w-4 h-4 text-brand-600" />
-              Option Forfait Pose par Installateur Certifié IRVE
+              Demander un devis d'installation certifiée IRVE
             </span>
-            <span className="text-brand-600 text-sm font-black">+590,00 € TTC</span>
+            <span className="text-emerald-700 text-xs font-black bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+              Devis Gratuit
+            </span>
           </div>
           <p className="text-slate-600 text-[11px] leading-relaxed">
-            Comprend le déplacement, la pose de la borne, la liaison tableau jusqu'à 10m et l'attestation de conformité pour le <strong>crédit d'impôt de 500 €</strong>.
+            Mise en relation gratuite avec un électricien qualifié IRVE de votre secteur pour une visite technique et un devis de pose personnalisé.
           </p>
         </div>
       </div>

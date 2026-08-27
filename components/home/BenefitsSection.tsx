@@ -8,14 +8,14 @@ export function BenefitsSection() {
       description: "Nous sélectionnons rigoureusement les meilleures bornes du marché sans compromis sur la fiabilité et la sécurité.",
     },
     {
-      icon: Award,
-      title: "Éligibilité Crédit d'Impôt 500 €",
-      description: "Toutes nos bornes connectées sont éligibles au crédit d'impôt forfaitaire de 500 € par point de charge pour les particuliers.",
+      icon: ShieldCheck,
+      title: "Garantie Constructeur 3 Ans",
+      description: "Toutes nos bornes bénéficient de la garantie européenne constructeur de 3 ans avec support technique réactif.",
     },
     {
       icon: Wrench,
-      title: "Réseau d'Électriciens IRVE",
-      description: "Possibilité de commander votre borne avec son forfait installation complet certifié NF C 15-100 partout en France.",
+      title: "Pose IRVE sur Devis Gratuit",
+      description: "Mise en relation directe avec notre réseau d'électriciens qualifiés IRVE partout en France pour une visite et un devis personnalisé.",
     },
     {
       icon: BadgePercent,
