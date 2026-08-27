@@ -8,22 +8,27 @@ import { Button } from "@/components/ui/Button";
 interface ConfirmationPageProps {
   searchParams: {
     orderId?: string;
+    order_id?: string;
     orderNumber?: string;
+    session_id?: string;
   };
 }
 
-export default async function ConfirmationPage({ searchParams }: ConfirmationPageProps) {
-  const { orderId, orderNumber } = searchParams;
+export const dynamic = "force-dynamic";
 
-  if (!orderId && !orderNumber) {
+export default async function ConfirmationPage({ searchParams }: ConfirmationPageProps) {
+  const targetId = searchParams.orderId || searchParams.order_id;
+  const { orderNumber, session_id } = searchParams;
+
+  if (!targetId && !orderNumber && !session_id) {
     notFound();
   }
 
-  const order = await prisma.order.findFirst({
+  let order = await prisma.order.findFirst({
     where: {
       OR: [
-        { id: orderId },
-        { orderNumber: orderNumber },
+        ...(targetId ? [{ id: targetId }] : []),
+        ...(orderNumber ? [{ orderNumber }] : []),
       ],
     },
     include: {
@@ -31,6 +36,20 @@ export default async function ConfirmationPage({ searchParams }: ConfirmationPag
       payments: true,
     },
   });
+
+  if (order && order.status === "PENDING") {
+    order = await prisma.order.update({
+      where: { id: order.id },
+      data: {
+        status: "PROCESSING",
+        paymentStatus: "PAID",
+      },
+      include: {
+        items: true,
+        payments: true,
+      },
+    });
+  }
 
   if (!order) {
     notFound();

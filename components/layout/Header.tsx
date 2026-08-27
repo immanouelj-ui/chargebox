@@ -20,18 +20,34 @@ interface HeaderProps {
 
 export function Header({ user }: HeaderProps) {
   const router = useRouter();
+  const [currentUser, setCurrentUser] = useState(user);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   const { openDrawer, getItemCount, getSubtotalTTC } = useCartStore();
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    // Fetch live session to keep header in sync with OAuth login
+    fetch("/api/auth/session")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.user) setCurrentUser(d.user);
+        else if (user) setCurrentUser(user);
+      })
+      .catch(() => {});
+  }, [user]);
 
   const itemCount = mounted ? getItemCount() : 0;
   const subtotal = mounted ? getSubtotalTTC() : 0;
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    setCurrentUser(null);
+    window.location.href = "/";
+  };
 
   return (
     <>
@@ -177,18 +193,78 @@ export function Header({ user }: HeaderProps) {
 
               {/* Account Dropdown */}
               <div className="relative group">
-                {user ? (
-                  <Link
-                    href={user.role === "ADMIN" ? "/admin" : "/mon-compte"}
-                    className="flex items-center gap-2 p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-slate-900 text-brand-400 font-bold text-xs flex items-center justify-center shadow-xs">
-                      {user.name ? user.name.slice(0, 2).toUpperCase() : "CB"}
+                {currentUser ? (
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                      className="flex items-center gap-2 p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-900 transition"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-slate-900 text-brand-400 font-black text-xs flex items-center justify-center shadow-xs">
+                        {currentUser.name ? currentUser.name.slice(0, 2).toUpperCase() : "CB"}
+                      </div>
+                      <div className="hidden xl:flex flex-col text-left pr-1">
+                        <span className="text-[11px] font-bold text-slate-900 max-w-[110px] truncate leading-tight">
+                          {currentUser.name || currentUser.email.split("@")[0]}
+                        </span>
+                        <span className="text-[9px] font-semibold text-brand-600 uppercase">
+                          {currentUser.role === "ADMIN" ? "Administrateur" : "Mon Compte"}
+                        </span>
+                      </div>
+                    </button>
+
+                    {/* Dropdown Menu */}
+                    <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-white p-2.5 shadow-2xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                      <div className="px-3 py-2 border-b border-slate-100 mb-1">
+                        <span className="text-xs font-bold text-slate-900 block truncate">
+                          {currentUser.name || "Client"}
+                        </span>
+                        <span className="text-[10px] text-slate-400 block truncate">
+                          {currentUser.email}
+                        </span>
+                      </div>
+
+                      {currentUser.role === "ADMIN" && (
+                        <Link
+                          href="/admin"
+                          className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 text-brand-400 hover:bg-slate-800 text-xs font-bold transition mb-1"
+                        >
+                          <span>👑 Tableau de Bord Admin</span>
+                        </Link>
+                      )}
+
+                      <Link
+                        href="/mon-compte"
+                        className="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50 text-xs font-semibold transition"
+                      >
+                        <span>📦 Mes Commandes</span>
+                      </Link>
+
+                      <Link
+                        href="/mon-compte/adresses"
+                        className="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50 text-xs font-semibold transition"
+                      >
+                        <span>📍 Mes Adresses</span>
+                      </Link>
+
+                      <Link
+                        href="/mon-compte/profil"
+                        className="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50 text-xs font-semibold transition"
+                      >
+                        <span>👤 Mon Profil</span>
+                      </Link>
+
+                      <div className="border-t border-slate-100 mt-1 pt-1">
+                        <button
+                          type="button"
+                          onClick={handleLogout}
+                          className="w-full text-left px-3 py-2 rounded-xl text-red-600 hover:bg-red-50 text-xs font-bold transition"
+                        >
+                          Déconnexion
+                        </button>
+                      </div>
                     </div>
-                    <span className="hidden xl:inline text-xs font-semibold text-slate-900 max-w-[100px] truncate">
-                      {user.name || user.email}
-                    </span>
-                  </Link>
+                  </div>
                 ) : (
                   <Link
                     href="/connexion"

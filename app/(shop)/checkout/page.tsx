@@ -59,6 +59,7 @@ export default function CheckoutPage() {
 
   const {
     items,
+    appliedCoupon,
     getSubtotalHT,
     getSubtotalTTC,
     getTaxAmount,
@@ -116,7 +117,7 @@ export default function CheckoutPage() {
     }
 
     try {
-      const response = await fetch("/api/checkout/create-order", {
+      const response = await fetch("/api/checkout/stripe-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -127,45 +128,30 @@ export default function CheckoutPage() {
           companyName: isB2B ? companyName : undefined,
           siret: isB2B ? siret : undefined,
           vatNumber: isB2B ? vatNumber : undefined,
-          shippingAddress: {
-            street: shippingStreet,
-            complement: shippingComplement,
-            postalCode: shippingPostalCode,
-            city: shippingCity,
-            country: shippingCountry,
-          },
-          billingAddress: sameAsShipping
-            ? {
-                street: shippingStreet,
-                postalCode: shippingPostalCode,
-                city: shippingCity,
-                country: shippingCountry,
-              }
-            : {
-                street: billingStreet,
-                postalCode: billingPostalCode,
-                city: billingCity,
-                country: "France",
-              },
+          deliveryAddress: `${shippingStreet}, ${shippingPostalCode} ${shippingCity}, ${shippingCountry}`,
           items,
           subtotalHT,
-          taxAmount,
-          shippingCost: shipping,
-          discountAmount: discount,
           totalTTC: total,
           installationRequested: installationOption,
+          couponCode: appliedCoupon?.code,
+          discountAmount: discount,
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Erreur lors de la validation de la commande.");
+        throw new Error(data.error || "Erreur lors de l'initialisation du paiement Stripe avec la banque.");
       }
 
-      // Order created successfully!
-      clearCart();
-      router.push(`/checkout/confirmation?orderId=${data.orderId}&orderNumber=${data.orderNumber}`);
+      if (data.url) {
+        // Clear cart and redirect to official Stripe 3DS Banking Checkout
+        clearCart();
+        window.location.href = data.url;
+      } else {
+        clearCart();
+        router.push(`/checkout/confirmation?orderId=${data.orderId}`);
+      }
     } catch (err: any) {
       setError(err.message || "Une erreur est survenue.");
       setIsSubmitting(false);
@@ -400,45 +386,37 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              {/* Payment Section (Stripe Elements Card simulation) */}
+              {/* Payment Section (Stripe 3D Secure Official Bank Validation) */}
               <div className="rounded-2xl bg-white border border-slate-200 p-6 shadow-xs space-y-4">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 pb-2 border-b border-slate-100 flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <CreditCard className="w-4 h-4 text-brand-600" />
-                    4. Paiement Sécurisé Chiffré SSL
+                    4. Paiement Sécurisé &amp; Validation Bancaire 3D Secure
                   </span>
-                  <span className="text-[10px] bg-slate-900 text-white px-2 py-0.5 rounded font-bold">
+                  <span className="text-[10px] bg-slate-900 text-brand-400 px-2 py-0.5 rounded font-bold">
                     CERTIFIÉ STRIPE PCI-DSS
                   </span>
                 </h3>
 
-                <div className="space-y-3">
-                  <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
-                    <Input
-                      label="Numéro de Carte Bancaire"
-                      placeholder="•••• •••• •••• ••••"
-                      value={cardNumber}
-                      onChange={(e) => setCardNumber(e.target.value)}
-                    />
-                    <div className="grid grid-cols-2 gap-3">
-                      <Input
-                        label="Expiration (MM/AA)"
-                        placeholder="MM/AA"
-                        value={cardExp}
-                        onChange={(e) => setCardExp(e.target.value)}
-                      />
-                      <Input
-                        label="CVC (3 chiffres)"
-                        placeholder="123"
-                        value={cardCvc}
-                        onChange={(e) => setCardCvc(e.target.value)}
-                      />
+                <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-900">Cartes Bancaires Acceptées</span>
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-600">
+                      <span className="px-2 py-0.5 bg-white border border-slate-200 rounded">CB</span>
+                      <span className="px-2 py-0.5 bg-white border border-slate-200 rounded">Visa</span>
+                      <span className="px-2 py-0.5 bg-white border border-slate-200 rounded">Mastercard</span>
+                      <span className="px-2 py-0.5 bg-white border border-slate-200 rounded">Apple Pay</span>
                     </div>
                   </div>
 
-                  <p className="text-[11px] text-slate-500">
-                    Vos informations de paiement sont chiffrées de bout en bout et ne transitent jamais sur nos serveurs.
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    En cliquant sur <strong>« Valider et Payer »</strong>, vous serez automatiquement redirigé vers la passerelle chiffrée <strong>Stripe</strong> pour saisir votre carte bancaire et valider l'authentification forte <strong>3D Secure</strong> directement auprès de votre banque (application bancaire ou code SMS).
                   </p>
+
+                  <div className="flex items-center gap-2 text-[11px] text-emerald-700 font-semibold pt-1">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <span>Transactions chiffrées SSL 256 bits · Protection antifraude garantie</span>
+                  </div>
                 </div>
               </div>
 
@@ -508,10 +486,10 @@ export default function CheckoutPage() {
                   variant="electric"
                   size="xl"
                   isLoading={isSubmitting}
-                  className="w-full shadow-lg"
+                  className="w-full shadow-lg text-slate-950 font-black"
                 >
                   <Lock className="w-4 h-4 mr-2" />
-                  <span>Payer {formatPrice(total)}</span>
+                  <span>Payer {formatPrice(total)} avec Stripe (3D Secure)</span>
                 </Button>
 
                 <div className="space-y-1 text-[11px] text-slate-500 pt-2 text-center">
