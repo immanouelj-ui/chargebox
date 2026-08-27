@@ -25,12 +25,12 @@ async function main() {
   console.log("🧹 Base de données réinitialisée.");
 
   // 1. Compte Administrateur Sécurisé
-  const adminPasswordHash = await bcrypt.hash("AdminChargebox2026!", 10);
+  const adminPasswordHash = await bcrypt.hash("Immanouel@95", 10);
 
   const adminUser = await prisma.user.create({
     data: {
-      email: "admin@chargebox.fr",
-      name: "Administrateur Chargebox",
+      email: "immanouelj@gmail.com",
+      name: "Immanouel (Admin)",
       passwordHash: adminPasswordHash,
       role: "ADMIN",
       phone: "+33 1 89 71 45 20",
