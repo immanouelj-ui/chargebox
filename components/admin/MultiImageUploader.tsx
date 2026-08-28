@@ -1,22 +1,75 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import Image from "next/image";
-import { Upload, X, Star, Plus, Image as ImageIcon, Loader2, Link as LinkIcon, Check } from "lucide-react";
+import { Upload, X, Star, Plus, Loader2, Link as LinkIcon } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-
-interface ImageItem {
-  url: string;
-  isPrimary?: boolean;
-}
 
 interface MultiImageUploaderProps {
   images: string[];
   onChange: (images: string[]) => void;
 }
 
+// Client-side image compressor: scales down 4K/10MB camera photos to lightweight web formats (~250KB)
+async function compressImage(file: File, maxWidth = 1600, quality = 0.85): Promise<File> {
+  // If not an image or SVG, return original
+  if (!file.type.startsWith("image/") || file.type === "image/svg+xml") {
+    return file;
+  }
+
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = document.createElement("img");
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth || height > maxWidth) {
+          if (width > height) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else {
+            width = Math.round((width * maxWidth) / height);
+            height = maxWidth;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), {
+                  type: "image/jpeg",
+                  lastModified: Date.now(),
+                });
+                resolve(compressedFile);
+              } else {
+                resolve(file);
+              }
+            },
+            "image/jpeg",
+            quality
+          );
+        } else {
+          resolve(file);
+        }
+      };
+      img.onerror = () => resolve(file);
+    };
+    reader.onerror = () => resolve(file);
+  });
+}
+
 export function MultiImageUploader({ images, onChange }: MultiImageUploaderProps) {
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState("");
   const [urlInput, setUrlInput] = useState("");
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -26,27 +79,53 @@ export function MultiImageUploader({ images, onChange }: MultiImageUploaderProps
     if (!files || files.length === 0) return;
 
     setIsUploading(true);
+    setUploadProgress("Optimisation des photos...");
+
     try {
-      const formData = new FormData();
+      const newUrls: string[] = [];
+
+      // Process and upload each file individually to stay well within limits
       for (let i = 0; i < files.length; i++) {
-        formData.append("files", files[i]);
+        setUploadProgress(`Téléversement de la photo ${i + 1}/${files.length}...`);
+        const originalFile = files[i];
+        const optimizedFile = await compressImage(originalFile);
+
+        const formData = new FormData();
+        formData.append("file", optimizedFile);
+
+        const res = await fetch("/api/admin/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        const textResponse = await res.text();
+        let data: any = {};
+        try {
+          data = JSON.parse(textResponse);
+        } catch {
+          throw new Error("Le serveur a refusé le fichier (trop volumineux ou format non supporté).");
+        }
+
+        if (!res.ok) {
+          throw new Error(data.error || "Erreur lors de l'envoi de l'image");
+        }
+
+        if (data.url) {
+          newUrls.push(data.url);
+        } else if (data.urls && data.urls.length > 0) {
+          newUrls.push(...data.urls);
+        }
       }
 
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Erreur lors de l'upload");
-
-      if (data.urls && data.urls.length > 0) {
-        onChange([...images, ...data.urls]);
+      if (newUrls.length > 0) {
+        onChange([...images, ...newUrls]);
       }
     } catch (err: any) {
       alert(err.message || "Erreur lors de l'upload des images");
     } finally {
       setIsUploading(false);
+      setUploadProgress("");
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -109,7 +188,7 @@ export function MultiImageUploader({ images, onChange }: MultiImageUploaderProps
         {isUploading ? (
           <div className="flex flex-col items-center justify-center py-4 space-y-2 text-brand-600">
             <Loader2 className="w-8 h-8 animate-spin" />
-            <span className="text-xs font-bold text-slate-700">Téléversement des images en cours...</span>
+            <span className="text-xs font-bold text-slate-700">{uploadProgress}</span>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center space-y-2">
@@ -121,7 +200,7 @@ export function MultiImageUploader({ images, onChange }: MultiImageUploaderProps
                 Cliquez pour importer ou glissez vos photos ici
               </span>
               <span className="text-xs text-slate-500">
-                Vous pouvez sélectionner plusieurs images simultanément (PNG, JPG, WEBP, SVG)
+                Sélectionnez une ou plusieurs photos (PNG, JPG, WEBP, SVG)
               </span>
             </div>
           </div>
@@ -138,7 +217,9 @@ export function MultiImageUploader({ images, onChange }: MultiImageUploaderProps
           <LinkIcon className="w-3.5 h-3.5" />
           <span>{showUrlInput ? "Masquer l'ajout par URL" : "+ Ajouter via une URL web"}</span>
         </button>
-        <span className="text-slate-400 font-medium">{images.length} image{images.length > 1 ? "s" : ""} ajoutée{images.length > 1 ? "s" : ""}</span>
+        <span className="text-slate-400 font-medium">
+          {images.length} photo{images.length > 1 ? "s" : ""}
+        </span>
       </div>
 
       {showUrlInput && (
@@ -201,7 +282,7 @@ export function MultiImageUploader({ images, onChange }: MultiImageUploaderProps
                 type="button"
                 onClick={() => handleRemove(idx)}
                 className="absolute top-2 right-2 w-7 h-7 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow-xs transition-all"
-                title="Supprimer cette image"
+                title="Supprimer cette photo"
               >
                 <X className="w-4 h-4" />
               </button>
