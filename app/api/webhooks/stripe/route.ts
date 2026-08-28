@@ -34,11 +34,15 @@ export async function POST(req: Request) {
 
       if (orderId) {
         try {
-          await prisma.order.update({
+          const updatedOrder = await prisma.order.update({
             where: { id: orderId },
             data: {
               status: "PROCESSING",
               paymentStatus: "PAID",
+            },
+            include: {
+              items: true,
+              payments: true,
             },
           });
 
@@ -55,7 +59,12 @@ export async function POST(req: Request) {
             },
           });
 
-          console.log(`✅ Commande #${orderId} marquée comme PAYÉE via Stripe Webhook.`);
+          // Send confirmation invoice email to customer and notification to admin
+          const { sendOrderConfirmationEmail, sendAdminNewOrderNotification } = await import("@/lib/email");
+          await sendOrderConfirmationEmail(updatedOrder).catch(console.error);
+          await sendAdminNewOrderNotification(updatedOrder).catch(console.error);
+
+          console.log(`✅ Commande #${orderId} marquée comme PAYÉE et emails envoyés via Stripe Webhook.`);
         } catch (dbError) {
           console.error("Erreur lors de la mise à jour de la commande via Webhook:", dbError);
         }

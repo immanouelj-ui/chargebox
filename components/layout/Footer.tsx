@@ -188,6 +188,12 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/suivi-commande" className="hover:text-brand-400 transition font-bold text-slate-200 flex items-center gap-1.5">
+                  <Truck className="w-3.5 h-3.5 text-brand-400" />
+                  <span>Suivi de Commande &amp; Facture</span>
+                </Link>
+              </li>
+              <li>
                 <Link href="/livraison" className="hover:text-brand-400 transition">
                   Livraison &amp; Délais
                 </Link>
