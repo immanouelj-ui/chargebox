@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Trash2, Eye, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { MultiImageUploader } from "@/components/admin/MultiImageUploader";
 
 interface EditProductPageProps {
   params: {
@@ -33,7 +34,7 @@ export default function AdminEditProductPage({ params }: EditProductPageProps) {
   const [connectorType, setConnectorType] = useState("T2S");
   const [shortDescription, setShortDescription] = useState("");
   const [description, setDescription] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [images, setImages] = useState<string[]>([]);
   const [isActive, setIsActive] = useState(true);
 
   // Features
@@ -63,7 +64,11 @@ export default function AdminEditProductPage({ params }: EditProductPageProps) {
         setConnectorType(p.connectorType || "T2S");
         setShortDescription(p.shortDescription || "");
         setDescription(p.description || "");
-        setImageUrl(p.images?.[0]?.url || "/images/products/teltonika-teltocharge.jpg");
+        setImages(
+          Array.isArray(p.images) && p.images.length > 0
+            ? p.images.map((img: any) => img.url)
+            : []
+        );
         setIsActive(p.isActive ?? true);
         setHasDynamicLoad(p.hasDynamicLoad ?? false);
         setHasSolarMode(p.hasSolarMode ?? false);
@@ -107,7 +112,7 @@ export default function AdminEditProductPage({ params }: EditProductPageProps) {
           connectorType,
           shortDescription,
           description,
-          imageUrl,
+          images,
           isActive,
           hasDynamicLoad,
           hasSolarMode,
@@ -239,18 +244,6 @@ export default function AdminEditProductPage({ params }: EditProductPageProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full rounded-xl bg-slate-800 border border-slate-700 p-2.5 text-xs text-white focus:outline-none focus:ring-2 focus:ring-brand-500 font-bold"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase">
-                Chemin de l'image (Ex: /images/products/teltonika-teltocharge.jpg)
-              </label>
-              <input
-                type="text"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                className="w-full rounded-xl bg-slate-800 border border-slate-700 p-2.5 text-xs text-white focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono"
               />
             </div>
           </div>
@@ -440,6 +433,17 @@ export default function AdminEditProductPage({ params }: EditProductPageProps) {
                 className="w-full rounded-xl bg-slate-800 border border-slate-700 p-2.5 text-xs text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
+          </div>
+        </div>
+
+        {/* Photos & Multi-Images Gallery */}
+        <div className="rounded-3xl bg-slate-900/80 border border-slate-800 p-6 space-y-4">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-brand-400 pb-2 border-b border-slate-800">
+            5. Photos du Produit &amp; Galerie Multi-Images
+          </h3>
+
+          <div>
+            <MultiImageUploader images={images} onChange={setImages} />
           </div>
         </div>
 

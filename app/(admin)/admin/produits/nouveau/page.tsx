@@ -7,6 +7,7 @@ import { ArrowLeft, Save, Sparkles, Package } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { MultiImageUploader } from "@/components/admin/MultiImageUploader";
 
 export default function AdminNouveauProduitPage() {
   const router = useRouter();
@@ -27,7 +28,9 @@ export default function AdminNouveauProduitPage() {
   const [connectorType, setConnectorType] = useState("T2S");
   const [shortDescription, setShortDescription] = useState("");
   const [description, setDescription] = useState("");
-  const [imageUrl, setImageUrl] = useState("/images/products/teltonika-teltocharge.jpg");
+  const [images, setImages] = useState<string[]>([
+    "/images/products/teltonika-teltocharge.jpg",
+  ]);
 
   // Options
   const [hasDynamicLoad, setHasDynamicLoad] = useState(true);
@@ -72,7 +75,7 @@ export default function AdminNouveauProduitPage() {
           connectorType,
           shortDescription,
           description,
-          imageUrl,
+          images,
           hasDynamicLoad,
           hasSolarMode,
           hasWifi,
@@ -343,15 +346,10 @@ export default function AdminNouveauProduitPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase">
-                Chemin de l'image principale
+              <label className="block text-xs font-semibold text-slate-300 mb-2 uppercase">
+                Photos du Produit (Galerie Multi-Images)
               </label>
-              <input
-                type="text"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                className="w-full rounded-xl bg-slate-800 border border-slate-700 p-2.5 text-xs text-white focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono"
-              />
+              <MultiImageUploader images={images} onChange={setImages} />
             </div>
           </div>
         </div>

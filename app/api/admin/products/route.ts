@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   try {
     const user = await getCurrentUser();
@@ -21,6 +23,7 @@ export async function POST(req: Request) {
       description,
       priceHT,
       priceTTC,
+      compareAtPrice,
       stock,
       powerKw,
       phaseType,
@@ -31,9 +34,21 @@ export async function POST(req: Request) {
       hasRfid,
       has4G,
       imageUrl,
+      images,
     } = body;
 
-    const slug = slugify(name);
+    if (!name || !priceTTC) {
+      return NextResponse.json({ error: "Le nom et le prix TTC sont obligatoires." }, { status: 400 });
+    }
+
+    const slug = `${slugify(name)}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    // Prepare images array
+    const imageList: string[] = Array.isArray(images) && images.length > 0
+      ? images
+      : imageUrl
+      ? [imageUrl]
+      : ["/images/products/teltonika-teltocharge.jpg"];
 
     const product = await prisma.product.create({
       data: {
@@ -41,32 +56,34 @@ export async function POST(req: Request) {
         slug,
         reference: reference || `REF-${Date.now()}`,
         sku: sku || `SKU-${Date.now()}`,
-        brandId,
-        categoryId,
+        brandId: brandId || (await prisma.brand.findFirst())?.id || "cmmockbrandid",
+        categoryId: categoryId || (await prisma.category.findFirst())?.id || "cmmockcatid",
         shortDescription: shortDescription || null,
         description: description || "",
-        priceHT: Number(priceHT),
+        priceHT: Number(priceHT || (Number(priceTTC) / 1.2)),
         priceTTC: Number(priceTTC),
+        compareAtPrice: compareAtPrice ? Number(compareAtPrice) : null,
         stock: Number(stock || 10),
         powerKw: Number(powerKw || 7.4),
         phaseType: phaseType || "MONO",
         connectorType: connectorType || "T2S",
-        hasDynamicLoad: !!hasDynamicLoad,
-        hasSolarMode: !!hasSolarMode,
-        hasWifi: !!hasWifi,
-        hasRfid: !!hasRfid,
-        has4G: !!has4G,
+        hasDynamicLoad: Boolean(hasDynamicLoad),
+        hasSolarMode: Boolean(hasSolarMode),
+        hasWifi: Boolean(hasWifi),
+        hasRfid: Boolean(hasRfid),
+        has4G: Boolean(has4G),
         isActive: true,
         images: {
-          create: [
-            {
-              url: imageUrl || "/images/products/teltonika-teltocharge.jpg",
-              alt: name,
-              isPrimary: true,
-              order: 0,
-            },
-          ],
+          create: imageList.map((url, index) => ({
+            url,
+            alt: `${name} - Photo ${index + 1}`,
+            isPrimary: index === 0,
+            order: index,
+          })),
         },
+      },
+      include: {
+        images: true,
       },
     });
 

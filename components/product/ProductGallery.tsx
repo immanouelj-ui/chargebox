@@ -28,6 +28,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
           alt={productName}
           fill
           priority
+          unoptimized={selectedImage.startsWith("data:") || selectedImage.startsWith("http")}
           className="object-contain p-4 drop-shadow-[0_15px_25px_rgba(0,0,0,0.12)] transition-all duration-300"
         />
       </div>
@@ -52,6 +53,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                   src={img.url}
                   alt={img.alt || productName}
                   fill
+                  unoptimized={img.url.startsWith("data:") || img.url.startsWith("http")}
                   className="object-contain p-1.5"
                 />
               </button>

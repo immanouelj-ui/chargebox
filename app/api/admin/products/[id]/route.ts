@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 // GET - Récupérer un produit pour édition
 export async function GET(
   req: Request,
@@ -13,8 +15,8 @@ export async function GET(
       include: {
         brand: true,
         category: true,
-        images: true,
-        specifications: true,
+        images: { orderBy: { order: "asc" } },
+        specifications: { orderBy: { order: "asc" } },
       },
     });
 
@@ -28,7 +30,7 @@ export async function GET(
   }
 }
 
-// PATCH / PUT - Mettre à jour un produit
+// PATCH - Mettre à jour un produit
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } }
@@ -58,6 +60,7 @@ export async function PATCH(
       hasRfid,
       has4G,
       imageUrl,
+      images,
     } = body;
 
     const updated = await prisma.product.update({
@@ -84,7 +87,19 @@ export async function PATCH(
       },
     });
 
-    if (imageUrl) {
+    // Update images if provided
+    if (Array.isArray(images) && images.length > 0) {
+      await prisma.productImage.deleteMany({ where: { productId: params.id } });
+      await prisma.productImage.createMany({
+        data: images.map((url: string, idx: number) => ({
+          productId: params.id,
+          url,
+          alt: `${updated.name} - Photo ${idx + 1}`,
+          isPrimary: idx === 0,
+          order: idx,
+        })),
+      });
+    } else if (imageUrl) {
       await prisma.productImage.deleteMany({ where: { productId: params.id } });
       await prisma.productImage.create({
         data: {
@@ -117,7 +132,6 @@ export async function DELETE(
       return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
     }
 
-    // Supprimer les relations associées
     await prisma.productSpecification.deleteMany({ where: { productId: params.id } });
     await prisma.productImage.deleteMany({ where: { productId: params.id } });
     await prisma.cartItem.deleteMany({ where: { productId: params.id } });
