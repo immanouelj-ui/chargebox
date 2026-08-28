@@ -112,13 +112,14 @@ export function HeroSection() {
               </div>
 
               {/* Product Visual */}
-              <div className="relative h-64 w-full my-4 flex items-center justify-center">
+              <div className="relative h-64 w-full my-4 rounded-2xl overflow-hidden bg-slate-950 border border-slate-700/60 flex items-center justify-center shadow-inner">
                 <Image
                   src="/images/products/teltonika-teltocharge.jpg"
-                  alt="Borne Teltonika TeltoCharge 7.4kW"
+                  alt="Borne Teltonika TeltoCharge - Finition Ardoise &amp; Étanchéité IP55"
                   fill
                   priority
-                  className="object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.5)]"
+                  unoptimized
+                  className="object-cover hover:scale-105 transition-transform duration-500"
                 />
               </div>
 
