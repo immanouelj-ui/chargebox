@@ -113,7 +113,7 @@ export function Header({ user }: HeaderProps) {
                 href="/produits"
                 className="px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-800 hover:text-brand-600 hover:bg-slate-50 transition"
               >
-                Toutes les Bornes
+                Boutique Bornes
               </Link>
 
               {/* Teltonika Highlight */}
@@ -125,79 +125,55 @@ export function Header({ user }: HeaderProps) {
                 <span>Teltonika</span>
               </Link>
 
-              {/* Dropdown Marques */}
+              {/* Guides 209 */}
+              <Link
+                href="/guides"
+                className="px-3 py-2 rounded-xl text-sm font-semibold text-slate-800 hover:text-brand-600 hover:bg-slate-50 transition"
+              >
+                Guides &amp; Comparatifs
+              </Link>
+
+              {/* Dropdown Installateurs IRVE & Villes */}
               <div className="relative group">
                 <Link
-                  href="/marques"
+                  href="/borne-de-recharge"
                   className="px-3 py-2 rounded-xl text-sm font-semibold text-slate-800 hover:text-brand-600 hover:bg-slate-50 transition flex items-center gap-1"
                 >
-                  <span>Marques</span>
+                  <span>Installateurs IRVE</span>
                   <ChevronDown className="w-4 h-4 text-slate-400 group-hover:rotate-180 transition-transform duration-200" />
                 </Link>
                 <div className="absolute left-0 top-full mt-1 w-64 rounded-2xl bg-white p-3 shadow-xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 py-1.5">
-                    Marques Partenaires
+                    Couverture Nationale
                   </div>
                   <Link
-                    href="/produits?brand=teltonika"
+                    href="/borne-de-recharge"
                     className="flex items-center justify-between p-2.5 rounded-xl hover:bg-brand-50/80 transition"
                   >
-                    <span className="text-sm font-bold text-slate-900">Teltonika Energy</span>
-                    <span className="text-[10px] font-bold bg-brand-500 text-slate-950 px-1.5 py-0.5 rounded">Vedette</span>
+                    <span className="text-sm font-bold text-slate-900">Par Ville (104 Villes)</span>
+                    <span className="text-[10px] font-bold bg-brand-500 text-slate-950 px-1.5 py-0.5 rounded">Populaire</span>
                   </Link>
                   <Link
-                    href="/produits?brand=wallbox"
+                    href="/installateur-irve"
                     className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition text-sm font-medium text-slate-800"
                   >
-                    Wallbox
+                    Par Département (46 Hubs)
                   </Link>
                   <Link
-                    href="/produits?brand=v2c"
+                    href="/simulateur-borne"
                     className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition text-sm font-medium text-slate-800"
                   >
-                    V2C Trydan (Solaire)
-                  </Link>
-                  <Link
-                    href="/produits?brand=schneider"
-                    className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition text-sm font-medium text-slate-800"
-                  >
-                    Schneider Electric
-                  </Link>
-                  <Link
-                    href="/produits?brand=hager"
-                    className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition text-sm font-medium text-slate-800"
-                  >
-                    Hager Witty
-                  </Link>
-                  <Link
-                    href="/produits?brand=legrand"
-                    className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition text-sm font-medium text-slate-800"
-                  >
-                    Legrand Green'up
+                    Simulateur de Devis
                   </Link>
                 </div>
               </div>
 
-              {/* Categories */}
+              {/* Devis Gratuit CTA Button */}
               <Link
-                href="/categories"
-                className="px-3 py-2 rounded-xl text-sm font-semibold text-slate-800 hover:text-brand-600 hover:bg-slate-50 transition"
+                href="/borne-de-recharge#devis"
+                className="px-3.5 py-2 rounded-xl text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition"
               >
-                Catégories
-              </Link>
-
-              <Link
-                href="/produits?category=protections-electriques"
-                className="px-3 py-2 rounded-xl text-sm font-semibold text-slate-800 hover:text-brand-600 hover:bg-slate-50 transition"
-              >
-                Protections IRVE
-              </Link>
-
-              <Link
-                href="/simulateur-borne"
-                className="px-3 py-2 rounded-xl text-sm font-semibold text-slate-800 hover:text-brand-600 hover:bg-slate-50 transition"
-              >
-                Simulateur
+                ⚡ 3 Devis Gratuits
               </Link>
             </nav>
 

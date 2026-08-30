@@ -1,18 +1,25 @@
 import { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
+import { GUIDES } from "@/content/guides";
+import { VILLES } from "@/content/villes";
+import { DEPARTEMENTS } from "@/content/departements";
 
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://chargebox.fr";
 
-  // 1. Pages Statiques Principales & Légales
+  // 1. Pages Statiques Principales & Hubs
   const staticPages = [
     "",
     "/produits",
+    "/guides",
+    "/borne-de-recharge",
+    "/installateur-irve",
     "/marques",
     "/categories",
     "/simulateur-borne",
+    "/suivi-commande",
     "/panier",
     "/contact",
     "/mentions-legales",
@@ -28,8 +35,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route === "" ? 1.0 : 0.8,
   }));
 
+  // 2. 209 Guides Piliers SEO
+  const guidePages = GUIDES.map((g) => ({
+    url: `${baseUrl}/guides/${g.slug}`,
+    lastModified: new Date(g.updated || Date.now()),
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  }));
+
+  // 3. 104 Pages Villes Locales
+  const villePages = VILLES.map((v) => ({
+    url: `${baseUrl}/borne-de-recharge/${v.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  }));
+
+  // 4. 46 Hubs Départements
+  const deptPages = DEPARTEMENTS.map((d) => ({
+    url: `${baseUrl}/installateur-irve/${d.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  }));
+
   try {
-    // 2. Pages Produits Dynamiques (générées en direct depuis la base de données)
+    // 5. Pages Produits Dynamiques depuis Prisma DB
     const products = await prisma.product.findMany({
       where: { isActive: true },
       select: { slug: true, updatedAt: true },
@@ -42,32 +73,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     }));
 
-    // 3. Pages Marques Dynamiques
-    const brands = await prisma.brand.findMany({
-      select: { slug: true, updatedAt: true },
-    });
-
-    const brandPages = brands.map((b) => ({
-      url: `${baseUrl}/produits?brand=${b.slug}`,
-      lastModified: b.updatedAt,
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    }));
-
-    // 4. Pages Catégories Dynamiques
-    const categories = await prisma.category.findMany({
-      select: { slug: true, updatedAt: true },
-    });
-
-    const categoryPages = categories.map((c) => ({
-      url: `${baseUrl}/produits?category=${c.slug}`,
-      lastModified: c.updatedAt,
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    }));
-
-    return [...staticPages, ...productPages, ...brandPages, ...categoryPages];
+    return [
+      ...staticPages,
+      ...productPages,
+      ...guidePages,
+      ...villePages,
+      ...deptPages,
+    ];
   } catch (error) {
-    return staticPages;
+    return [...staticPages, ...guidePages, ...villePages, ...deptPages];
   }
 }
